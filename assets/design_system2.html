@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Hive.Me - Premium Design System v2.0</title>
+
+    <!-- Scripts based on base templates -->
+    <script src="templates/genlabs.aura.build/assets/resource_3fa48481346f.js"></script>
+    <script src="templates/genlabs.aura.build/assets/iconify_654a1ef798a3.js"></script>
+    <link href="templates/genlabs.aura.build/assets/css2_d532a689d235.css" rel="stylesheet" />
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        hiveme: '#FEC22A',
+                        hivemeLight: '#FFE699',
+                        hivemeDark: '#D49D1A'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #ffffff; color: #1C1C1C; overflow-x: hidden; }
+
+        /* Background Effects */
+        .grid-bg {
+            background-size: 40px 40px;
+            background-image:
+                linear-gradient(to right, rgba(254, 194, 42, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(254, 194, 42, 0.05) 1px, transparent 1px);
+        }
+        
+        .bg-mesh-glow {
+            position: absolute;
+            background: radial-gradient(circle at 50% 50%, rgba(254, 194, 42, 0.15), rgba(255, 255, 255, 0) 60%);
+            width: 80vw;
+            height: 80vw;
+            top: -40vw;
+            left: -10vw;
+            border-radius: 50%;
+            z-index: 0;
+            pointer-events: none;
+            animation: pulse-glow 8s infinite alternate ease-in-out;
+        }
+
+        @keyframes pulse-glow {
+            0% { transform: scale(1) translate(0, 0); opacity: 0.6; }
+            50% { transform: scale(1.1) translate(2%, 5%); opacity: 0.9; }
+            100% { transform: scale(0.9) translate(-2%, -2%); opacity: 0.6; }
+        }
+
+        /* Glassmorphism */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Text Effects */
+        .text-glass {
+            background: linear-gradient(135deg, rgba(28,28,28,0.9) 0%, rgba(28,28,28,0.4) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Reveal Animations */
+        .reveal { opacity: 0; transform: translateY(2rem); transition: all 1s cubic-bezier(0.16, 1, 0.3, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+        
+        /* Text Reveal Animation */
+        .text-reveal-wrapper { overflow: hidden; display: inline-block; vertical-align: bottom; }
+        .text-reveal-content {
+            transform: translateY(110%);
+            opacity: 0;
+            transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 1.2s ease;
+            display: block;
+        }
+        .reveal-active .text-reveal-content { transform: translateY(0); opacity: 1; }
+
+        /* Beam Button Animation */
+        .beam-button { position: relative; overflow: hidden; }
+        .beam-button::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+            transition: left 0.7s ease;
+        }
+        .beam-button:hover::before { left: 100%; }
+
+        /* Glow Effects */
+        .glow-on-hover { transition: all 0.3s ease; }
+        .glow-on-hover:hover {
+            box-shadow: 0 0 30px rgba(254, 194, 42, 0.3);
+            transform: translateY(-2px);
+            border-color: rgba(254, 194, 42, 0.5);
+        }
+
+        /* Flashlight Card */
+        .flashlight-card { position: relative; background: rgba(255, 255, 255, 0.8); overflow: hidden; }
+        .flashlight-card::before {
+            content: ""; position: absolute; inset: 0px;
+            background: radial-gradient(400px circle at var(--mouse-x) var(--mouse-y), rgba(254, 194, 42, 0.15), transparent 40%);
+            opacity: 0; transition: opacity 0.5s; pointer-events: none; z-index: 2;
+        }
+        .flashlight-card:hover::before { opacity: 1; }
+
+        /* Marquee Animation */
+        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        .marquee-container { display: flex; overflow: hidden; user-select: none; }
+        .marquee-content { flex-shrink: 0; display: flex; justify-content: space-around; min-width: 100%; animation: marquee 30s linear infinite; }
+
+        /* Delays */
+        .delay-100 { transition-delay: 0.1s; }
+        .delay-200 { transition-delay: 0.2s; }
+        .delay-300 { transition-delay: 0.3s; }
+        .delay-500 { transition-delay: 0.5s; }
+        .delay-700 { transition-delay: 0.7s; }
+
+        /* Nav Animation */
+        .nav-load { opacity: 0; transform: translateY(-10px); transition: all 0.8s ease-out; }
+        .nav-load.loaded { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+
+<body class="antialiased min-h-screen selection:bg-hiveme selection:text-zinc-900 bg-white">
+
+    <!-- Navigation -->
+    <header class="fixed top-0 left-0 right-0 z-50 glass-panel border-b border-zinc-200/50 nav-load py-4 px-6 md:px-12">
+        <div class="max-w-[1400px] mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-full border border-zinc-200 flex items-center justify-center p-1 bg-white shadow-sm glow-on-hover">
+                    <img src="raw_files/Logotipo.png" alt="Hive.Me" class="w-full h-full object-contain" />
+                </div>
+                <span class="font-medium tracking-tight text-zinc-900 hidden sm:block">
+                    Hive.<span class="text-zinc-400">Me</span> Design System
+                </span>
+            </div>
+            
+            <nav class="hidden md:flex gap-8 items-center bg-white/50 px-6 py-2 rounded-full border border-zinc-200">
+                <a class="text-xs font-semibold tracking-widest uppercase hover:text-hiveme transition-colors text-zinc-500" href="#typography">Tipografia</a>
+                <a class="text-xs font-semibold tracking-widest uppercase hover:text-hiveme transition-colors text-zinc-500" href="#colors">Cores</a>
+                <a class="text-xs font-semibold tracking-widest uppercase hover:text-hiveme transition-colors text-zinc-500" href="#components">Componentes</a>
+                <a class="text-xs font-semibold tracking-widest uppercase hover:text-hiveme transition-colors text-zinc-500" href="#animations">Animações</a>
+            </nav>
+
+            <div class="flex items-center gap-4">
+                <button class="beam-button px-5 py-2.5 bg-zinc-900 text-white rounded-full text-xs font-medium hover:bg-zinc-800 transition-all flex items-center gap-2 shadow-lg shadow-zinc-900/20">
+                    <span>Exportar Assets</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center justify-center overflow-hidden grid-bg pt-20">
+        <div class="bg-mesh-glow"></div>
+        
+        <div class="relative z-10 max-w-7xl mx-auto px-6 text-center mt-12">
+            
+            <!-- Hero Title with Text Reveal & Transparent Glass Look -->
+            <div class="mb-6" id="hero-title">
+                <h1 class="text-6xl md:text-[8rem] font-bold tracking-tighter leading-[0.9]">
+                    <span class="text-reveal-wrapper">
+                        <span class="text-reveal-content delay-200 text-glass">Design.</span>
+                    </span>
+                    <br class="md:hidden" />
+                    <span class="text-reveal-wrapper">
+                        <span class="text-reveal-content delay-300 text-transparent bg-clip-text bg-gradient-to-r from-zinc-300 via-zinc-400 to-zinc-200" style="-webkit-text-stroke: 1px rgba(0,0,0,0.05);">System.</span>
+                    </span>
+                </h1>
+            </div>
+
+            <p class="text-lg md:text-xl text-zinc-500 mb-12 max-w-2xl mx-auto reveal delay-500 font-medium">
+                Padrões de Interface avançados, componentes dinâmicos e tipografia precisa desenhados para produtos High-Ticket da Hive.Me Academy.
+            </p>
+
+            <!-- CTA Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center reveal delay-700">
+                <button class="group beam-button relative px-8 py-4 bg-hiveme text-zinc-900 rounded-full text-sm font-bold hover:bg-hivemeDark transition-all flex items-center gap-3 shadow-xl shadow-hiveme/20 glow-on-hover">
+                    <span>Explorar Componentes</span>
+                    <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </button>
+
+                <button class="px-8 py-4 bg-white border border-zinc-200 text-zinc-900 rounded-full text-sm font-semibold hover:border-hiveme hover:bg-zinc-50 transition-all shadow-sm">
+                    Ver Guia de Estilos
+                </button>
+            </div>
+
+            <!-- Decorative Badges -->
+            <div class="mt-16 flex flex-wrap gap-3 justify-center reveal delay-700">
+                <span class="px-4 py-1.5 border border-zinc-200 rounded-full text-xs font-mono font-medium text-zinc-500 uppercase bg-white/60 backdrop-blur-sm">Acessível</span>
+                <span class="px-4 py-1.5 border border-zinc-200 rounded-full text-xs font-mono font-medium text-zinc-500 uppercase bg-white/60 backdrop-blur-sm shadow-[0_0_15px_rgba(254,194,42,0.15)] border-hiveme/30 text-hivemeDark">Animado</span>
+                <span class="px-4 py-1.5 border border-zinc-200 rounded-full text-xs font-mono font-medium text-zinc-500 uppercase bg-white/60 backdrop-blur-sm">High-Ticket</span>
+                <span class="px-4 py-1.5 border border-zinc-200 rounded-full text-xs font-mono font-medium text-zinc-500 uppercase bg-white/60 backdrop-blur-sm">Sistêmico</span>
+            </div>
+        </div>
+
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 reveal delay-700 opacity-60">
+            <span class="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Scroll</span>
+            <div class="w-[1px] h-12 bg-gradient-to-b from-zinc-300 to-transparent"></div>
+        </div>
+    </section>
+
+    <!-- Marquee Divider -->
+    <div class="border-y border-zinc-100 overflow-hidden py-5 bg-zinc-50/50 backdrop-blur-md">
+        <div class="marquee-container">
+            <div class="marquee-content items-center">
+                <span class="text-xs font-bold uppercase tracking-widest text-zinc-400 mx-8 flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-hiveme"></div> HIVE.ME ACADEMY</span>
+                <span class="text-xs font-bold uppercase tracking-widest text-zinc-400 mx-8 flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-zinc-300"></div> DESIGN SYSTEM</span>
+                <span class="text-xs font-bold uppercase tracking-widest text-zinc-400 mx-8 flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-zinc-300"></div> HIGH-TICKET UI</span>
+                <span class="text-xs font-bold uppercase tracking-widest text-zinc-400 mx-8 flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-zinc-300"></div> MOTION ENGINE</span>
+            </div>
+            <div class="marquee-content items-center" aria-hidden="true">
+                <span class="text-xs font-bold uppercase tracking-widest text-zinc-400 mx-8 flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-hiveme"></div> HIVE.ME ACADEMY</span>
+                <span class="text-xs font-bold uppercase tracking-widest text-zinc-400 mx-8 flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-zinc-300"></div> DESIGN SYSTEM</span>
+                <span class="text-xs font-bold uppercase tracking-widest text-zinc-400 mx-8 flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-zinc-300"></div> HIGH-TICKET UI</span>
+                <span class="text-xs font-bold uppercase tracking-widest text-zinc-400 mx-8 flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-zinc-300"></div> MOTION ENGINE</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Typography Section -->
+    <section id="typography" class="py-32 bg-white relative">
+        <div class="max-w-[1200px] mx-auto px-6 md:px-12">
+            <div class="mb-20 reveal">
+                <div class="inline-block px-3 py-1 bg-zinc-100 rounded-lg text-xs font-bold uppercase tracking-widest text-zinc-500 mb-4">01. Fundamentos</div>
+                <h2 class="text-4xl md:text-5xl font-bold tracking-tight text-zinc-900 mb-4">Tipografia</h2>
+                <p class="text-zinc-500 max-w-lg">A fundação do nosso design conversacional. Limpo, legível e desenhado para escalar do mobile aos displays mais amplos.</p>
+            </div>
+
+            <!-- Typography Spec Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 border-t border-zinc-200 pt-8 reveal delay-100 items-baseline group hover:bg-zinc-50 transition-colors p-4 -mx-4 rounded-xl">
+                <div class="col-span-3">
+                    <span class="text-xs font-mono font-medium text-zinc-400 uppercase tracking-widest bg-zinc-100 px-2 py-1 rounded">Heading 1</span>
+                </div>
+                <div class="col-span-6 overflow-hidden">
+                    <h1 class="text-6xl md:text-7xl font-bold tracking-tighter text-zinc-900 transform transition-transform group-hover:translate-x-2">High-Ticket</h1>
+                </div>
+                <div class="col-span-3 text-right">
+                    <p class="text-sm font-mono text-zinc-600">Inter / Bold / -5% / 100%</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 border-t border-zinc-100 pt-8 reveal delay-200 items-baseline group hover:bg-zinc-50 transition-colors p-4 -mx-4 rounded-xl">
+                <div class="col-span-3">
+                    <span class="text-xs font-mono font-medium text-zinc-400 uppercase tracking-widest bg-zinc-100 px-2 py-1 rounded">Heading 2</span>
+                </div>
+                <div class="col-span-6 overflow-hidden">
+                    <h2 class="text-4xl md:text-5xl font-semibold tracking-tight text-zinc-900 transform transition-transform group-hover:translate-x-2">Conversão Modular</h2>
+                </div>
+                <div class="col-span-3 text-right">
+                    <p class="text-sm font-mono text-zinc-600">Inter / Semibold / -2.5% / 110%</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 border-t border-zinc-100 pt-8 reveal delay-300 items-baseline group hover:bg-zinc-50 transition-colors p-4 -mx-4 rounded-xl">
+                <div class="col-span-3">
+                    <span class="text-xs font-mono font-medium text-zinc-400 uppercase tracking-widest bg-zinc-100 px-2 py-1 rounded">Body Large</span>
+                </div>
+                <div class="col-span-6 overflow-hidden">
+                    <p class="text-xl leading-relaxed text-zinc-600 font-medium transform transition-transform group-hover:translate-x-2">
+                        O texto de corpo grande é usado em destaques de introdução, depoimentos ou trechos que exigem grande atenção do leitor.
+                    </p>
+                </div>
+                <div class="col-span-3 text-right">
+                    <p class="text-sm font-mono text-zinc-600">Inter / Medium / 0% / 160%</p>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 border-t border-zinc-100 pt-8 reveal delay-400 items-baseline group hover:bg-zinc-50 transition-colors p-4 -mx-4 rounded-xl">
+                <div class="col-span-3">
+                    <span class="text-xs font-mono font-medium text-zinc-400 uppercase tracking-widest bg-zinc-100 px-2 py-1 rounded">Caption / Mono</span>
+                </div>
+                <div class="col-span-6 overflow-hidden">
+                    <p class="text-xs font-mono tracking-widest uppercase text-hiveme font-bold transform transition-transform group-hover:translate-x-2">
+                        Status: Ativo | Última atualização: 14:02
+                    </p>
+                </div>
+                <div class="col-span-3 text-right">
+                    <p class="text-sm font-mono text-zinc-600">SF Mono / Bold / +10% / 150%</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Colors Section -->
+    <section id="colors" class="py-32 bg-zinc-50 border-y border-zinc-200">
+        <div class="max-w-[1200px] mx-auto px-6 md:px-12">
+            <div class="mb-20 reveal">
+                <div class="inline-block px-3 py-1 bg-white border border-zinc-200 rounded-lg text-xs font-bold uppercase tracking-widest text-zinc-500 mb-4 shadow-sm">02. Estética</div>
+                <h2 class="text-4xl md:text-5xl font-bold tracking-tight text-zinc-900 mb-4">Sistema de Cores</h2>
+                <p class="text-zinc-500 max-w-lg">O contraste perfeito. Uso predominante de brancos e cinzas claros para o conteúdo brilhar, com nossa cor Yellow/Gold para guiar as conversões.</p>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <!-- Color Card HiveMe -->
+                <div class="col-span-1 p-6 md:p-8 bg-white border border-zinc-200 rounded-2xl flex flex-col aspect-square glow-on-hover hover:border-hiveme reveal transition-all relative overflow-hidden group">
+                    <div class="absolute inset-0 bg-hiveme transform translate-y-full group-hover:translate-y-[90%] transition-transform duration-500"></div>
+                    <div class="w-12 h-12 rounded-full bg-hiveme mb-6 shadow-lg shadow-hiveme/40 group-hover:scale-110 transition-transform"></div>
+                    <div class="mt-auto relative z-10">
+                        <div class="font-bold text-zinc-900 text-lg mb-1">Brand Gold</div>
+                        <div class="font-mono text-xs text-zinc-500 bg-zinc-100 inline-block px-2 py-1 rounded">#FEC22A</div>
+                        <div class="text-[10px] uppercase text-zinc-400 mt-2 font-bold tracking-wider">Primary Action</div>
+                    </div>
+                </div>
+
+                <!-- Color Card Zinc 900 -->
+                <div class="col-span-1 p-6 md:p-8 bg-zinc-900 rounded-2xl flex flex-col aspect-square glow-on-hover hover:border-zinc-700 reveal delay-100 transition-all shadow-xl">
+                    <div class="w-12 h-12 rounded-full bg-black mb-6 border border-zinc-700"></div>
+                    <div class="mt-auto">
+                        <div class="font-bold text-white text-lg mb-1">Zinc 900</div>
+                        <div class="font-mono text-xs text-zinc-400 bg-zinc-800 inline-block px-2 py-1 rounded">#18181b</div>
+                        <div class="text-[10px] uppercase text-zinc-500 mt-2 font-bold tracking-wider">Text / Headings</div>
+                    </div>
+                </div>
+
+                <!-- Color Card White -->
+                <div class="col-span-1 p-6 md:p-8 bg-white border border-zinc-200 rounded-2xl flex flex-col aspect-square glow-on-hover reveal delay-200 transition-all">
+                    <div class="w-12 h-12 rounded-full bg-white mb-6 border border-zinc-200 shadow-sm shrink-0"></div>
+                    <div class="mt-auto">
+                        <div class="font-bold text-zinc-900 text-lg mb-1">White</div>
+                        <div class="font-mono text-xs text-zinc-500 bg-zinc-100 inline-block px-2 py-1 rounded">#FFFFFF</div>
+                        <div class="text-[10px] uppercase text-zinc-400 mt-2 font-bold tracking-wider">Background / Cards</div>
+                    </div>
+                </div>
+
+                <!-- Color Card Zinc 100 -->
+                <div class="col-span-1 p-6 md:p-8 bg-zinc-100 border border-zinc-200 rounded-2xl flex flex-col aspect-square glow-on-hover reveal delay-300 transition-all">
+                    <div class="w-12 h-12 rounded-full bg-zinc-200 mb-6 border border-zinc-300"></div>
+                    <div class="mt-auto">
+                        <div class="font-bold text-zinc-900 text-lg mb-1">Zinc 100</div>
+                        <div class="font-mono text-xs text-zinc-500 bg-white inline-block px-2 py-1 rounded shadow-sm">#F4F4F5</div>
+                        <div class="text-[10px] uppercase text-zinc-400 mt-2 font-bold tracking-wider">Surfaces / Borders</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Gradients preview -->
+            <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 reveal delay-400">
+                <div class="p-6 rounded-2xl bg-gradient-to-br from-hivemeLight to-hiveme border border-hiveme/20 relative overflow-hidden group">
+                    <div class="absolute right-0 bottom-0 w-32 h-32 bg-white/20 rounded-full filter blur-xl group-hover:scale-150 transition-transform duration-700"></div>
+                    <p class="font-bold text-zinc-900 mb-1">Gradient Brand</p>
+                    <p class="font-mono text-xs text-zinc-800/70">from-hivemeLight to-hiveme</p>
+                </div>
+                <div class="p-6 rounded-2xl bg-gradient-to-r from-zinc-200 via-zinc-50 to-white border border-zinc-200 relative overflow-hidden group">
+                    <div class="absolute left-0 top-0 w-32 h-32 bg-black/5 rounded-full filter blur-xl group-hover:scale-150 transition-transform duration-700"></div>
+                    <p class="font-bold text-zinc-900 mb-1">Gradient Silver</p>
+                    <p class="font-mono text-xs text-zinc-500">from-zinc-200 to-white</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- UI Components Section -->
+    <section id="components" class="py-32 bg-white relative">
+        <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-bl from-zinc-100 to-transparent rounded-full filter blur-3xl opacity-50 -z-10"></div>
+        
+        <div class="max-w-[1200px] mx-auto px-6 md:px-12">
+            <div class="mb-20 reveal">
+                <div class="inline-block px-3 py-1 bg-zinc-100 rounded-lg text-xs font-bold uppercase tracking-widest text-zinc-500 mb-4">03. UI Elements</div>
+                <h2 class="text-4xl md:text-5xl font-bold tracking-tight text-zinc-900 mb-4">Componentes</h2>
+                <p class="text-zinc-500 max-w-lg">Elementos interativos com estados definidos, transitions suaves e forte ênfase em usabilidade e feedback tátil (micro-interações).</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <!-- Inputs & Controls -->
+                <div class="space-y-12 reveal">
+                    <div>
+                        <h3 class="text-sm font-bold uppercase tracking-widest text-zinc-400 mb-6 flex items-center gap-2"><div class="w-1 h-4 bg-hiveme rounded"></div> Inputs</h3>
+                        <div class="space-y-4 p-8 border border-zinc-100 rounded-2xl bg-zinc-50/50">
+                            <!-- Default Input -->
+                            <div class="flex flex-col gap-2">
+                                <label class="text-xs font-bold text-zinc-700">Nome Completo</label>
+                                <input type="text" placeholder="Digite seu nome" class="w-full px-4 py-3 bg-white border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-hiveme/50 focus:border-hiveme transition-all text-sm shadow-sm" />
+                            </div>
+                            
+                            <!-- Search Input with icon -->
+                            <div class="flex flex-col gap-2 mt-4">
+                                <label class="text-xs font-bold text-zinc-700">Pesquisa</label>
+                                <div class="relative">
+                                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                    <input type="text" placeholder="Buscar módulos..." class="w-full pl-10 pr-4 py-3 bg-white border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-hiveme/50 focus:border-hiveme transition-all text-sm shadow-sm" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Buttons & Badges -->
+                <div class="space-y-12 reveal delay-100">
+                    <div>
+                        <h3 class="text-sm font-bold uppercase tracking-widest text-zinc-400 mb-6 flex items-center gap-2"><div class="w-1 h-4 bg-zinc-900 rounded"></div> Botões & Badges</h3>
+                        <div class="space-y-6 p-8 border border-zinc-100 rounded-2xl bg-white shadow-sm glow-on-hover">
+                            
+                            <div class="flex flex-wrap items-center gap-4">
+                                <!-- Primary Action -->
+                                <button class="beam-button px-6 py-3 bg-hiveme text-zinc-900 rounded-full text-sm font-bold hover:bg-hivemeDark hover:-translate-y-0.5 transition-all flex items-center gap-2 shadow-lg shadow-hiveme/20 group">
+                                    Ação Primária
+                                    <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                                </button>
+                                
+                                <!-- Secondary Action -->
+                                <button class="px-6 py-3 bg-zinc-900 text-white rounded-full text-sm font-semibold hover:bg-zinc-800 hover:shadow-xl hover:-translate-y-0.5 transition-all">
+                                    Dark Botton
+                                </button>
+                            </div>
+
+                            <div class="flex flex-wrap items-center gap-4">
+                                <!-- Outline -->
+                                <button class="px-6 py-3 border border-zinc-300 text-zinc-700 bg-white rounded-full text-sm font-semibold hover:border-zinc-900 hover:text-zinc-900 hover:bg-zinc-50 transition-all">
+                                    Contorno
+                                </button>
+                                
+                                <!-- Ghost -->
+                                <button class="px-6 py-3 text-zinc-500 rounded-full text-sm font-medium hover:bg-zinc-100 hover:text-zinc-900 transition-all">
+                                    Ghost Link
+                                </button>
+                            </div>
+
+                            <hr class="border-zinc-100" />
+                            
+                            <div class="flex flex-wrap items-center gap-3">
+                                <span class="px-3 py-1 bg-green-100 text-green-700 border border-green-200 rounded-md text-xs font-bold uppercase tracking-widest">Sucesso</span>
+                                <span class="px-3 py-1 bg-hivemeLight/30 text-hivemeDark border border-hiveme/30 rounded-md text-xs font-bold uppercase tracking-widest">Alerta</span>
+                                <span class="px-3 py-1 bg-zinc-100 text-zinc-600 border border-zinc-200 rounded-md text-xs font-bold uppercase tracking-widest">Neutro</span>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Cards -->
+                <div class="lg:col-span-2 reveal delay-200">
+                    <h3 class="text-sm font-bold uppercase tracking-widest text-zinc-400 mb-6 flex items-center gap-2"><div class="w-1 h-4 bg-zinc-400 rounded"></div> Interação de Superfície (Cards)</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Flashlight Card implementation -->
+                        <div class="flashlight-card p-8 border border-zinc-200 rounded-2xl cursor-pointer shadow-sm group" onmousemove="const rect = this.getBoundingClientRect(); this.style.setProperty('--mouse-x', `${event.clientX - rect.left}px`); this.style.setProperty('--mouse-y', `${event.clientY - rect.top}px`);">
+                            <div class="relative z-10">
+                                <div class="w-12 h-12 bg-zinc-100 text-zinc-600 rounded-xl flex items-center justify-center mb-6 group-hover:text-hiveme group-hover:bg-hivemeLight/20 transition-colors">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                </div>
+                                <h4 class="text-xl font-bold text-zinc-900 mb-3">Flashlight Effect</h4>
+                                <p class="text-zinc-500 text-sm leading-relaxed">Mova o cursor sobre este card para perceber um efeito de luz (flashlight) rastreando o seu mouse sutilmente no background.</p>
+                            </div>
+                        </div>
+
+                        <!-- Float & Glow Card -->
+                        <div class="p-8 border border-zinc-200 rounded-2xl cursor-pointer bg-white glow-on-hover group">
+                            <div class="relative z-10 transition-transform duration-500 group-hover:-translate-y-1">
+                                <div class="w-12 h-12 bg-hiveme text-zinc-900 rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-hiveme/30">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+                                </div>
+                                <h4 class="text-xl font-bold text-zinc-900 mb-3">Glow & Float</h4>
+                                <p class="text-zinc-500 text-sm leading-relaxed">Interação mais robusta utilizando sombra expandida na cor da marca e levantamento físico do elemento e seus itens internos.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Icons Section -->
+    <section id="icons" class="py-32 bg-zinc-50 border-t border-zinc-200">
+        <div class="max-w-[1200px] mx-auto px-6 md:px-12 text-center reveal">
+            <div class="inline-block px-3 py-1 bg-white border border-zinc-200 rounded-lg text-xs font-bold uppercase tracking-widest text-zinc-500 mb-4 shadow-sm">04. Assets</div>
+            <h2 class="text-4xl md:text-5xl font-bold tracking-tight text-zinc-900 mb-16">Iconografia</h2>
+            
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-8 justify-items-center">
+                <div class="flex flex-col items-center gap-4 reveal">
+                    <div class="w-16 h-16 bg-white rounded-2xl shadow-sm border border-zinc-200 flex items-center justify-center text-zinc-900 hover:text-hiveme hover:border-hiveme hover:-translate-y-1 transition-all cursor-pointer">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                    </div>
+                    <span class="text-[10px] font-mono text-zinc-400 uppercase tracking-wider">dashboard</span>
+                </div>
+
+                <div class="flex flex-col items-center gap-4 reveal delay-100">
+                    <div class="w-16 h-16 bg-white rounded-2xl shadow-sm border border-zinc-200 flex items-center justify-center text-zinc-900 hover:text-hiveme hover:border-hiveme hover:-translate-y-1 transition-all cursor-pointer">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    </div>
+                    <span class="text-[10px] font-mono text-zinc-400 uppercase tracking-wider">users</span>
+                </div>
+
+                <div class="flex flex-col items-center gap-4 reveal delay-200">
+                    <div class="w-16 h-16 bg-white rounded-2xl shadow-sm border border-zinc-200 flex items-center justify-center text-zinc-900 hover:text-hiveme hover:border-hiveme hover:-translate-y-1 transition-all cursor-pointer">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    </div>
+                    <span class="text-[10px] font-mono text-zinc-400 uppercase tracking-wider">chart</span>
+                </div>
+
+                <div class="flex flex-col items-center gap-4 reveal delay-300">
+                    <div class="w-16 h-16 bg-white rounded-2xl shadow-sm border border-zinc-200 flex items-center justify-center text-zinc-900 hover:text-hiveme hover:border-hiveme hover:-translate-y-1 transition-all cursor-pointer">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    </div>
+                    <span class="text-[10px] font-mono text-zinc-400 uppercase tracking-wider">settings</span>
+                </div>
+                
+                <div class="flex flex-col items-center gap-4 reveal delay-400">
+                    <div class="w-16 h-16 bg-white rounded-2xl shadow-sm border border-zinc-200 flex items-center justify-center text-zinc-900 hover:text-hiveme hover:border-hiveme hover:-translate-y-1 transition-all cursor-pointer">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                    </div>
+                    <span class="text-[10px] font-mono text-zinc-400 uppercase tracking-wider">video</span>
+                </div>
+
+                <div class="flex flex-col items-center gap-4 reveal delay-500">
+                    <div class="w-16 h-16 bg-white rounded-2xl shadow-sm border border-zinc-200 flex items-center justify-center text-zinc-900 hover:text-hiveme hover:border-hiveme hover:-translate-y-1 transition-all cursor-pointer">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                    </div>
+                    <span class="text-[10px] font-mono text-zinc-400 uppercase tracking-wider">message</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black text-white py-16 text-center border-t border-zinc-900">
+        <div class="max-w-[1200px] mx-auto px-6">
+            <div class="w-12 h-12 bg-white rounded-xl mx-auto flex items-center justify-center p-2 mb-6">
+                <img src="raw_files/Logotipo.png" alt="Hive.Me" class="w-full h-full object-contain" />
+            </div>
+            <h3 class="text-2xl font-bold tracking-tight mb-2">Hive.Me Academy <span class="text-hiveme">Design System 2.0</span></h3>
+            <p class="text-zinc-500 text-sm">Escalando o crescimento com conversão modular e design high-ticket.</p>
+        </div>
+    </footer>
+
+    <!-- Application Script for Animations -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Wait slightly to trigger load animations
+            setTimeout(() => {
+                document.querySelector('header').classList.add('loaded');
+                const heroTitle = document.getElementById('hero-title');
+                if (heroTitle) heroTitle.classList.add('reveal-active');
+            }, 150);
+
+            // Scroll Reveal Observer
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.15
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        // Se houver wrapper de texto dentro, a gente ativa também
+                        const textWrappers = entry.target.querySelectorAll('.text-reveal-wrapper');
+                        if (textWrappers.length > 0 || entry.target.classList.contains('text-reveal-wrapper')) {
+                            entry.target.classList.add('reveal-active');
+                        }
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+</html>
