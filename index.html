@@ -857,6 +857,54 @@
             // Logic for Modals & Pipe.Run API
             const PIPERUN_TOKEN = "5cd1c69f153b1b858a667ed011bd9989";
             const CHECKOUT_URL = "https://flutepay-dev.azurewebsites.net/checkout/55fdba70/planejamento--concorrencia";
+            const EVOLUTION_URL = "https://stenio-evolution.vfgbmr.easypanel.host";
+            const EVOLUTION_INSTANCE = "hiveme";
+            const EVOLUTION_APIKEY = "Steni0-o312";
+
+            // Capture UTMs from URL on page load
+            function getUTMParams() {
+                const params = new URLSearchParams(window.location.search);
+                return {
+                    source: params.get('utm_source') || '',
+                    medium: params.get('utm_medium') || '',
+                    campaign: params.get('utm_campaign') || '',
+                    term: params.get('utm_term') || '',
+                    content: params.get('utm_content') || ''
+                };
+            }
+
+            const utmParams = getUTMParams();
+
+            // Format phone number with Brazil country code for WhatsApp
+            function formatPhoneForWhatsApp(phone) {
+                const digits = phone.replace(/\D/g, '');
+                if (digits.startsWith('55') && digits.length >= 12) {
+                    return digits;
+                }
+                return '55' + digits;
+            }
+
+            // Send WhatsApp message via Evolution API
+            async function sendWhatsAppMessage(phone, name) {
+                const formattedPhone = formatPhoneForWhatsApp(phone);
+                const message = `Olá ${name}! 👋\n\nRecebemos seu cadastro na *Hive.Me*. Em breve nossa equipe entrará em contato para te ajudar a organizar suas métricas e escalar seus resultados. 🚀\n\nFique de olho no seu WhatsApp!`;
+
+                try {
+                    await fetch(`${EVOLUTION_URL}/message/sendText/${EVOLUTION_INSTANCE}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'apikey': EVOLUTION_APIKEY
+                        },
+                        body: JSON.stringify({
+                            number: formattedPhone,
+                            text: message
+                        })
+                    });
+                } catch(err) {
+                    console.error('WhatsApp Warning:', err);
+                }
+            }
 
             window.openLeadModal = function() {
                 const modal = document.getElementById('leadModal');
@@ -889,6 +937,17 @@
                         observationText += `\nUrgência relatada: ${urgency}`;
                     }
 
+                    // Append UTMs if present
+                    const hasUtms = utmParams.source || utmParams.medium || utmParams.campaign;
+                    if (hasUtms) {
+                        observationText += `\n\n--- UTMs ---`;
+                        if (utmParams.source)   observationText += `\nSource: ${utmParams.source}`;
+                        if (utmParams.medium)   observationText += `\nMedium: ${utmParams.medium}`;
+                        if (utmParams.campaign) observationText += `\nCampaign: ${utmParams.campaign}`;
+                        if (utmParams.term)     observationText += `\nTerm: ${utmParams.term}`;
+                        if (utmParams.content)  observationText += `\nContent: ${utmParams.content}`;
+                    }
+
                     const payload = {
                         title: `Lead: ${name}`,
                         pipeline_id: 98596, // Pré Vendas
@@ -897,16 +956,19 @@
                         observation: observationText
                     };
 
-                    await fetch('https://api.pipe.run/v1/deals', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Token': PIPERUN_TOKEN
-                        },
-                        body: JSON.stringify(payload)
-                    });
+                    await Promise.all([
+                        fetch('https://api.pipe.run/v1/deals', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Token': PIPERUN_TOKEN
+                            },
+                            body: JSON.stringify(payload)
+                        }),
+                        sendWhatsAppMessage(phone, name)
+                    ]);
                 } catch(err) {
-                    console.error('PipeRun Warning:', err); // Ignore failure logic to not block checkout
+                    console.error('Lead Warning:', err); // Ignore failure logic to not block checkout
                 }
 
                 window.location.href = CHECKOUT_URL;
