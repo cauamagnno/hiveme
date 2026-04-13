@@ -956,7 +956,7 @@
                         observation: observationText
                     };
 
-                    await Promise.all([
+                    await Promise.allSettled([
                         fetch('https://api.pipe.run/v1/deals', {
                             method: 'POST',
                             headers: {
@@ -964,7 +964,7 @@
                                 'Token': PIPERUN_TOKEN
                             },
                             body: JSON.stringify(payload)
-                        }),
+                        }).catch(err => console.error('PipeRun Warning:', err)),
                         sendWhatsAppMessage(phone, name)
                     ]);
                 } catch(err) {
