@@ -878,18 +878,23 @@
                 }, 300);
             };
 
-            async function submitToPipeRun(name, phone, btnElement) {
+            async function submitToPipeRun(name, phone, btnElement, urgency = null) {
                 const originalText = btnElement.innerHTML;
                 btnElement.innerHTML = '<span class="animate-pulse">Criando acesso e redirecionando...</span>';
                 btnElement.disabled = true;
 
                 try {
+                    let observationText = `Nome: ${name} | WhatsApp: ${phone} \n\nLead gerado via Landing Page Hive.Me`;
+                    if (urgency) {
+                        observationText += `\nUrgência relatada: ${urgency}`;
+                    }
+
                     const payload = {
                         title: `Lead: ${name}`,
                         pipeline_id: 98596, // Pré Vendas
                         stage_id: 631484, // Lead
                         status: 0, // Open
-                        observation: `Nome: ${name} | WhatsApp: ${phone} \n\nLead gerado via Landing Page Hive.Me`
+                        observation: observationText
                     };
 
                     await fetch('https://api.pipe.run/v1/deals', {
@@ -922,7 +927,9 @@
                     const btn = document.getElementById('submitFooterBtn');
                     const name = document.getElementById('footerName').value;
                     const phone = document.getElementById('footerPhone').value;
-                    submitToPipeRun(name, phone, btn);
+                    const urgencyQuery = document.querySelector('#footerForm select');
+                    const urgencyValue = urgencyQuery ? urgencyQuery.value : null;
+                    submitToPipeRun(name, phone, btn, urgencyValue);
                 });
             }
         });
